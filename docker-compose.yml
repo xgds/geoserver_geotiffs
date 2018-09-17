@@ -1,0 +1,44 @@
+version: '2'
+
+services:
+  db:
+    logging:
+      driver: none
+    image: kartoza/postgis:9.6-2.4
+    volumes:
+      - ./geo-db-data:/var/lib/postgresql
+    ports:
+      - "25432:5432"
+    environment:
+      - USERNAME=docker
+      - PASS=docker
+      - ALLOW_IP_RANGE=0.0.0.0/0
+
+  geoserver:
+    image: kartoza/geoserver:2.13.0
+    volumes:
+      - ./geoserver-data-new:/opt/geoserver/data_dir
+    ports:
+      - "8080:8080"
+    restart: on-failure
+    depends_on:
+      - db
+    environment:
+      - GEOSERVER_DATA_DIR=/opt/geoserver/data_dir
+      - ENABLE_JSONP=true
+      - MAX_FILTER_RULES=20
+      - OPTIMIZE_LINE_WIDTH=false
+      - FOOTPRINTS_DATA_DIR=/opt/footprints_dir
+      - GEOWEBCACHE_CACHE_DIR=/opt/geoserver/data_dir/gwc
+
+  python-tests:
+    build: ./python-tests
+    volumes:
+      - ./geotiffs:/geotiffs
+    depends_on:
+      - db
+      - geoserver
+
+  
+
+
