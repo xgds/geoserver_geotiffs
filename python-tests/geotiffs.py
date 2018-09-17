@@ -5,6 +5,7 @@ from string import ascii_lowercase, digits
 from random import choice
 from pprint import pprint
 from shutil import copyfileobj
+from glob import glob
 
 
 def random_string_generator(N):
@@ -107,7 +108,12 @@ def upload_geotiff(file_handle):
 
 
 if __name__ == "__main__":
+    # -----------------------------------------------------------
+    # this example will use the first file in the geotiffs mounted volume
+    # that it can find; it also will sleep for 10 seconds before it starts
+    # so it can give time for geoserver to wake up and init.
+    # -----------------------------------------------------------
     sleep(10)
-    with open("/geotiffs/NA087_20170907_Heceta_North_5m_img.tif", 'rb') as f:
-        upload_geotiff(f)
+    file_path = glob("/geotiffs/*.tif")[0]
+    with open(file_path, 'rb') as f: upload_geotiff(f)
 
